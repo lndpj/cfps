@@ -20,8 +20,8 @@ make install
 ```
 ### Output
 ```sh
-           uptime             frames                fps  calendar time
-[              27] [          983083] [         1011505] Tue Aug  4 14:52:55 2026
+           uptime       frames total         frames sec                fps  calendar time
+[             101] [        98905046] [          407272] [         1010861] Tue Aug  4 15:04:53 2026
 ```
 ### Keyboard Layout
 - `ESC `       to exit sucessful

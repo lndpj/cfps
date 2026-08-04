@@ -33,9 +33,11 @@ struct
 	FUNC_PTR_FPS           fps;
 	struct
 	{
-		size_t       cnt;
+		uint64_t     cnt;
+		size_t       acc;
 		size_t       fps;
 		char cnt_str[32];
+		char acc_str[32];
 		char fps_str[32];
 	} frame;
 	struct
@@ -46,38 +48,41 @@ struct
 		char     str[32];
 		char     sec_str[32];
 	} time;
-} sys = { .interrupt = sys_sigint, .alarm = sys_sigalrm, .init = sys_init, .halt = sys_halt, .step = sys_step, .print = sys_print, .fps = sys_fps, .frame.cnt = 0, .frame.fps = 0, .frame.fps_str = "", .frame.cnt_str = "", .time.now = 0, .time.beg = 0, .time.sec = 0, .time.str = "" };
+} sys = { .interrupt = sys_sigint, .alarm = sys_sigalrm, .init = sys_init, .halt = sys_halt, .step = sys_step, .print = sys_print, .fps = sys_fps, .frame.acc = 0, .frame.cnt = 0, .frame.fps = 0, .frame.fps_str = "", .frame.cnt_str = "", .frame.acc_str = "", .time.now = 0, .time.beg = 0, .time.sec = 0, .time.str = "" };
 
 static inline bool sys_print()
 {
 		static bool first = true;
 		if(first)
 		{
-			printf(" %16s   %16s   %16s  %s", "uptime", "frames", "fps", "calendar time");
+			printf(" %16s   %16s   %16s   %16s  %s", "uptime", "frames total", "frames sec", "fps", "calendar time");
 			puts("");
 			first = false;
 		}
-		printf("\r[%16s] [%16s] [%16s] %s",
+		printf("\r[%16s] [%16s] [%16s] [%16s] %s",
 		sys.time.sec_str,
 		sys.frame.cnt_str,
-		sys.frame.fps == 0 ? sys.frame.cnt_str : sys.frame.fps_str,
+		sys.frame.acc_str,
+		sys.frame.fps == 0 ? sys.frame.acc_str : sys.frame.fps_str,
 		sys.time.str);
 		return true;
 }
 
 static inline bool sys_step()
 {
-	sys.frame.cnt++;
-	snprintf(sys.frame.cnt_str, 31, "%16zu", sys.frame.cnt);
+	sys.frame.acc++;
+	snprintf(sys.frame.acc_str, 31, "%16zu", sys.frame.acc);
 	return true;
 }
 
 static inline char* sys_fps()
 {
-	sys.frame.fps = sys.frame.cnt;
-	sys.frame.cnt = 0;
+	sys.frame.cnt += sys.frame.acc;
+	sys.frame.fps = sys.frame.acc;
+	sys.frame.acc = 0;
 
 	snprintf(sys.frame.fps_str, 31, "%16zu", sys.frame.fps);
+	snprintf(sys.frame.cnt_str, 31, "%16zu", sys.frame.cnt);
 	return sys.frame.fps_str;
 }
 
