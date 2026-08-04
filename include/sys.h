@@ -6,12 +6,12 @@
 #include <string.h>
 #include "term.h"
 
-typedef void (*FUNC_PTR_SIGNAL)(int sig);
-typedef bool (*FUNC_PTR_INIT)(void);
-typedef void (*FUNC_PTR_HALT)(void);
-typedef bool (*FUNC_PTR_STEP)(void);
-typedef bool (*FUNC_PTR_PRINT)(void);
-typedef char* (*FUNC_PTR_FPS)(void);
+typedef void  (*FUNC_PTR_SIGNAL)(int sig);
+typedef bool  (*FUNC_PTR_INIT)  (void   );
+typedef void  (*FUNC_PTR_HALT)  (void   );
+typedef bool  (*FUNC_PTR_STEP)  (void   );
+typedef bool  (*FUNC_PTR_PRINT) (void   );
+typedef char* (*FUNC_PTR_FPS)   (void   );
 
 static inline bool  sys_init();
 static inline void  sys_halt();
@@ -61,7 +61,7 @@ static inline bool sys_print()
 		}
 		printf("\r[%16s] [%16s] [%16s] [%16s] %s",
 		sys.time.sec_str,
-		sys.frame.cnt_str,
+		sys.frame.fps == 0 ? sys.frame.acc_str : sys.frame.cnt_str,
 		sys.frame.acc_str,
 		sys.frame.fps == 0 ? sys.frame.acc_str : sys.frame.fps_str,
 		sys.time.str);
