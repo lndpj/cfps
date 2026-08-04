@@ -40,17 +40,28 @@ struct
 	} frame;
 	struct
 	{
+		time_t       beg;
 		time_t       now;
+		size_t       sec;
 		char     str[32];
+		char     sec_str[32];
 	} time;
-} sys = { .interrupt = sys_sigint, .alarm = sys_sigalrm, .init = sys_init, .halt = sys_halt, .step = sys_step, .print = sys_print, .fps = sys_fps, .frame.cnt = 0, .frame.fps = 0, .frame.fps_str = "", .frame.cnt_str = "", .time.now = 0, .time.str = "" };
+} sys = { .interrupt = sys_sigint, .alarm = sys_sigalrm, .init = sys_init, .halt = sys_halt, .step = sys_step, .print = sys_print, .fps = sys_fps, .frame.cnt = 0, .frame.fps = 0, .frame.fps_str = "", .frame.cnt_str = "", .time.now = 0, .time.beg = 0, .time.sec = 0, .time.str = "" };
 
 static inline bool sys_print()
 {
-		printf("\r%s [%s] [%s]",
-		sys.time.str,
+		static bool first = true;
+		if(first)
+		{
+			printf(" %16s   %16s   %16s  %s", "uptime", "frames", "fps", "calendar time");
+			puts("");
+			first = false;
+		}
+		printf("\r[%16s] [%16s] [%16s] %s",
+		sys.time.sec_str,
 		sys.frame.cnt_str,
-		sys.frame.fps == 0 ? sys.frame.cnt_str : sys.frame.fps_str);
+		sys.frame.fps == 0 ? sys.frame.cnt_str : sys.frame.fps_str,
+		sys.time.str);
 		return true;
 }
 
@@ -72,9 +83,19 @@ static inline char* sys_fps()
 
 static inline char* sys_time()
 {
+	static bool first = true;
 	sys.time.now = time(NULL);
+	if(first)
+	{
+		sys.time.beg = sys.time.now; sys.time.sec = 0; first = false;
+	}
+	else
+	{
+		sys.time.sec++;
+	}
 	ctime_r(&sys.time.now, sys.time.str);
 	sys.time.str[strlen(sys.time.str) - 1] = '\0';
+	snprintf(sys.time.sec_str, 31, "%16zu", sys.time.sec);
 	return sys.time.str;
 }
 
