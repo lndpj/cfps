@@ -109,6 +109,8 @@ static inline bool sys_init()
 	sys_time();
 	atexit(sys.halt);
 	signal(SIGINT, sys.interrupt);
+	signal(SIGHUP, sys.interrupt);
+	signal(SIGTERM, sys.interrupt);
 	signal(SIGALRM,sys.alarm);
 	alarm(1);
 
